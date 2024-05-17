@@ -1,48 +1,8 @@
-import { axiosClient } from "@/lib/utils";
-import NextAuth, { AuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+import NextAuth from "next-auth/next";
+import { options } from "./options";
 
-export const authOptions: AuthOptions = {
-  providers: [
-    CredentialsProvider({
-      name: "credentials",
-      credentials: {
-        email: {},
-        password: {},
-      },
-      async authorize(credentials, req) {
-        const { data } = await axiosClient.post("/auth/sign-in", {
-          email: credentials!.email,
-          password: credentials!.password,
-        });
+const handler = NextAuth(
+    options
+)
 
-        if (data.success) {
-          return data.data;
-        }
-
-        return null;
-      },
-    }),
-  ],
-
-  session: {
-    strategy: "jwt",
-  },
-
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) return { ...token, ...user };
-      return token;
-    },
-    async session({ token, session }) {
-      session.user = token.user;
-      session.authorization = token.authorization;
-      console.log("From the session callback", token);
-      return session;
-    },
-  },
-};
-
-const handler = NextAuth(authOptions);
-
-export { handler as GET, handler as POST };
+export {handler as GET, handler as POST}

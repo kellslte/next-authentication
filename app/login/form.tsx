@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Icons } from "@/components/icons";
 import { Eye, EyeOff } from "lucide-react";
+// import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 const formSchema = z.object({
@@ -33,6 +34,24 @@ const formSchema = z.object({
 });
 
 const LoginForm = () => {
+  // const router = useRouter();
+  // const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  //   event.preventDefault();
+  //   const formData = new FormData(event.currentTarget);
+  //   const id = formData.get("id");
+  //   const email = formData.get("email");
+  //   const name = formData.get("name");
+  //   const req = await signIn("credentials", {
+  //     redirect: false,
+  //     id,
+  //     email,
+  //     name,
+  //   });
+  //   if (req?.ok) {
+  //     router.push("/");
+  //   } 
+  // };
+
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [inputType, setInputType] = useState<string>("password");
 
@@ -46,20 +65,20 @@ const LoginForm = () => {
 
   const handleFormSubmission = async (data: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
-    const response = await signIn('credentials',{ 
+    const response = await signIn("credentials", {
       ...data,
       redirect: false,
-      callbackUrl: 'http://localhost:3000/dashboard'
-    })
-    console.log({response})
+      callbackUrl: "http://localhost:3000/dashboard",
+    });
+    console.log({ response });
     setTimeout(() => {
       setIsSubmitting(false);
     }, 3000);
   };
 
   const changeInputType = () => {
-    setInputType(inputType === "password"? "text" : "password");
-  }
+    setInputType(inputType === "password" ? "text" : "password");
+  };
 
   return (
     <Form {...formDetails}>
@@ -94,14 +113,16 @@ const LoginForm = () => {
                     type={inputType}
                     placeholder="Enter your password"
                   />
-                  <button type="button" onClick={changeInputType} className="-ml-6">
-                    {
-                        inputType === "password"? (
-                          <Eye className="h-4 w-4" />
-                        ) : (
-                          <EyeOff className="h-4 w-4" />
-                        )
-                    }
+                  <button
+                    type="button"
+                    onClick={changeInputType}
+                    className="-ml-6"
+                  >
+                    {inputType === "password" ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeOff className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </FormControl>
