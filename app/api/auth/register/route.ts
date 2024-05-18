@@ -1,11 +1,11 @@
-import { axiosClient } from "@/lib/utils";
+import { Axios } from "@/lib/utils";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request, res: Response) {
   try {
     const { name, email, password } = await req.json();
 
-    const { data } = await axiosClient.post("/auth/sign-up", {
+    const { data } = await Axios.post("/auth/sign-up", {
       name,
       email,
       password,

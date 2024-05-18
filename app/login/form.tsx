@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Icons } from "@/components/icons";
 import { Eye, EyeOff } from "lucide-react";
 import { signIn } from "next-auth/react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -35,6 +37,7 @@ const formSchema = z.object({
 const LoginForm = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [inputType, setInputType] = useState<string>("password");
+  const router = useRouter();
 
   const formDetails = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,22 +47,25 @@ const LoginForm = () => {
     },
   });
 
-  const handleFormSubmission = async (data: z.infer<typeof formSchema>) => {
+  const handleFormSubmission = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
-    const response = await signIn('credentials',{ 
-      ...data,
+    const response = await signIn("credentials", {
+      ...values,
       redirect: false,
-      callbackUrl: 'http://localhost:3000/dashboard'
-    })
-    console.log({response})
+    });
+
     setTimeout(() => {
-      setIsSubmitting(false);
+      if (response!.ok && response!.status === 200) {
+        setIsSubmitting(false);
+        toast.success("User Logged In Successfully");
+        router.push("/dashboard");
+      }
     }, 3000);
   };
 
   const changeInputType = () => {
-    setInputType(inputType === "password"? "text" : "password");
-  }
+    setInputType(inputType === "password" ? "text" : "password");
+  };
 
   return (
     <Form {...formDetails}>
@@ -94,14 +100,16 @@ const LoginForm = () => {
                     type={inputType}
                     placeholder="Enter your password"
                   />
-                  <button type="button" onClick={changeInputType} className="-ml-6">
-                    {
-                        inputType === "password"? (
-                          <Eye className="h-4 w-4" />
-                        ) : (
-                          <EyeOff className="h-4 w-4" />
-                        )
-                    }
+                  <button
+                    type="button"
+                    onClick={changeInputType}
+                    className="-ml-6"
+                  >
+                    {inputType === "password" ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeOff className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </FormControl>
